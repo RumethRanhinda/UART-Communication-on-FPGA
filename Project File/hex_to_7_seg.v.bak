@@ -1,0 +1,36 @@
+module hex_to_7seg (
+    input  wire [3:0] i_Hex,
+    input  wire       i_Parity_Err,
+    output reg  [7:0] o_Segment // Order: {DP, G, F, E, D, C, B, A}
+);
+
+    always @(*) begin
+        if (i_Parity_Err == 1'b1) begin
+            // Parity Error: Turn ON the Decimal Point (Bit 7), everything else OFF
+            o_Segment = 8'b10000000; 
+        end else begin
+            // Normal Operation: DP is OFF, decode the hex value
+            case (i_Hex)
+                //                     DPGFEDCBA
+                4'h0: o_Segment = 8'b0_0111111;
+                4'h1: o_Segment = 8'b0_0000110;
+                4'h2: o_Segment = 8'b0_1011011;
+                4'h3: o_Segment = 8'b0_1001111;
+                4'h4: o_Segment = 8'b0_1100110;
+                4'h5: o_Segment = 8'b0_1101101;
+                4'h6: o_Segment = 8'b0_1111101;
+                4'h7: o_Segment = 8'b0_0000111;
+                4'h8: o_Segment = 8'b0_1111111;
+                4'h9: o_Segment = 8'b0_1101111;
+                4'hA: o_Segment = 8'b0_1110111;
+                4'hB: o_Segment = 8'b0_1111100;
+                4'hC: o_Segment = 8'b0_0111001;
+                4'hD: o_Segment = 8'b0_1011110;
+                4'hE: o_Segment = 8'b0_1111001;
+                4'hF: o_Segment = 8'b0_1110001;
+                default: o_Segment = 8'b0_0000000;
+            endcase
+        end
+    end
+
+endmodule

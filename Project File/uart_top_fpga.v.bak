@@ -1,0 +1,75 @@
+module uart_top_fpga (
+    input  wire       CLOCK_50,   // 50MHz Onboard Clock
+    input  wire       KEY_0,      // TX Trigger Button (Active Low)
+    input  wire       KEY_1,      // Display Reset Button (Active Low)
+    input  wire [3:0] SW,         // 4 Onboard DIP Switches
+    input  wire       UART_RXD,   // Serial RX (From physical jumper)
+    output wire       UART_TXD,   // Serial TX (To physical jumper)
+    output wire [7:0] SEG_OUT     // 7-Segment Display Output (To Breadboard)
+);
+
+    wire       w_Tx_Trigger;
+    wire [7:0] w_Rx_Byte;
+    wire       w_Rx_DV;
+    wire       w_Parity_Error;
+
+    // Display Holding Registers (Memory Latch)
+    // Initialized to 0 so the display turns on showing '0'
+    reg [3:0] r_Display_Hex = 4'h0; 
+    reg       r_Display_Err = 1'b0; 
+
+    // 1. Button Edge Detector (TX Trigger)
+    // Converts the 100ms human press into a single 20ns pulse
+    button_pulse BTN_INST (
+        .i_Clock(CLOCK_50),
+        .i_Btn_Raw(KEY_0),
+        .o_Pulse(w_Tx_Trigger)
+    );
+
+    // 2. UART Transmitter
+    uart_tx #(
+        .CLKS_PER_BIT(5208),        // 50MHz / 9600 Baud
+        .PARITY_TYPE(0)             // 0 = Even Parity
+    ) TX_INST (
+        .i_Clock(CLOCK_50),
+        .i_Tx_DV(w_Tx_Trigger),        
+        .i_Tx_Byte({4'b0000, SW}),  // Pad the 4 switches with leading zeros
+        .o_Tx_Active(),
+        .o_Tx_Serial(UART_TXD),
+        .o_Tx_Done()
+    );
+
+    // 3. UART Receiver
+    uart_rx #(
+        .CLKS_PER_BIT(5208),        // 50MHz / 9600 Baud
+        .PARITY_TYPE(0)             // 0 = Even Parity
+    ) RX_INST (
+        .i_Clock(CLOCK_50),
+        .i_Rx_Serial(UART_RXD),
+        .o_Rx_DV(w_Rx_DV),
+        .o_Rx_Byte(w_Rx_Byte),
+        .o_Rx_Parity_Error(w_Parity_Error)
+    );
+
+    // 4. Memory Latch & Reset Logic
+    always @(posedge CLOCK_50) begin
+        if (KEY_1 == 1'b0) begin 
+            // Reset button pressed: clear display to 0
+            r_Display_Hex <= 4'h0;
+            r_Display_Err <= 1'b0;
+        end else if (w_Rx_DV == 1'b1) begin
+            // Valid byte received: lock the new data into the register
+            r_Display_Hex <= w_Rx_Byte[3:0];
+            r_Display_Err <= w_Parity_Error;
+        end
+    end
+
+    // 5. 7-Segment Decoder
+    // Driven entirely by the Memory Latch, never the raw receiver
+    hex_to_7_seg DISPLAY_INST (
+        .i_Hex(r_Display_Hex),    
+        .i_Parity_Err(r_Display_Err),
+        .o_Segment(SEG_OUT)
+    );
+
+endmodule

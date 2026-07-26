@@ -1,0 +1,17 @@
+module button_pulse (
+    input  wire i_Clock,
+    input  wire i_Btn_Raw,  // Connected directly to DE0-Nano KEY[0]
+    output wire o_Pulse
+);
+
+    reg [2:0] r_Shift_Reg = 3'b111; // Initialize to 1 (unpressed)
+
+    always @(posedge i_Clock) begin
+        // Shift the button state through a register to synchronize it
+        r_Shift_Reg <= {r_Shift_Reg[1:0], i_Btn_Raw};
+    end
+
+    // Trigger a 1-cycle pulse only when the synchronized signal transitions from High (1) to Low (0)
+    assign o_Pulse = (r_Shift_Reg[2] == 1'b1 && r_Shift_Reg[1] == 1'b0);
+
+endmodule
