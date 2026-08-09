@@ -52,7 +52,7 @@ Additionally, an oscilloscope was used to probe the TX line. The capture confirm
 ## How to Run
 1. Clone this repository to your local machine.
 2. Open the project in Intel Quartus Prime.
-3. Select `uart_top_fpga.v` as the top module run Compile & Synthesis on the project.
+3. Select `uart_top_fpga.v` as the top module and run Compile & Synthesis on the project.
 4. Wire the 7-segment display according to the pin assignments.
 5. Connect the `UART_TXD` pin to the `UART_RXD` pin for loopback testing.
 6. Set a 4-bit hexadecimal value on the DIP switches and press `KEY_0` to transmit the frame.
