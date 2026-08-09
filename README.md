@@ -45,8 +45,6 @@ Hardware testing was conducted successfully in two configurations:
 1.  **Single-Board Loopback**: The `UART_TXD` and `UART_RXD` pins on a single DE0-Nano were connected via a jumper wire.
 2.  **Inter-Board Communication**: Two DE0-Nano boards were connected (TX of one to RX of the other) with a common ground, successfully passing known data values between them.
 
-*(Insert Videos/GIFs of hardware testing here - e.g., transmission between the two boards)*
-
 Additionally, an oscilloscope was used to probe the TX line. The capture confirmed the idle HIGH state, the bit pattern, and the ~104.16 µs bit duration expected for a 9600 bps baud rate.
 
 ![Oscilloscope Capture](Images/Oscilloscope_Validation.jpg)
