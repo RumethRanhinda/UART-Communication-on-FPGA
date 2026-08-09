@@ -6,7 +6,7 @@ This repository contains the Verilog HDL implementation of a Universal Asynchron
 
 The system facilitates reliable serial data transfer at a baud rate of 9600 bps using the onboard 50 MHz clock of the DE0-Nano FPGA board. It includes both a transmitter and a receiver that communicate using a standard UART frame: one start bit, eight data bits, a parity bit for basic error detection, and a stop bit.
 
-*(Insert image of Figure 1: UART frame structure here)*
+![Oscilloscope Capture](Images/UART_Frame.png)
 
 ## Features
 *   **Selectable Parity**: Supports both even and odd parity checking.
@@ -31,13 +31,13 @@ The design is mapped to the Altera DE0-Nano Cyclone IV FPGA board using the 3.3-
 *   **Outputs**: Received data is sent to an external 7-segment display driven by 8 GPIO pins.
 *   **UART Lines**: `UART_TXD` and `UART_RXD` are mapped to designated GPIO pins.
 
-*(Insert image of Figure 5: Quartus Prime Pin Planner mappings here)*
+![Oscilloscope Capture](Images/Pin_Planner.png)
 
 ## Simulation
 
 The system's functional correctness was verified via a SystemVerilog testbench (`tb_uart.v`) using ModelSim. The transmitter and receiver were connected in a loopback configuration to validate proper frame generation, mid-bit sampling, and parity verification.
 
-*(Insert image of Figure 4: Simulation waveform results here)*
+![Oscilloscope Capture](Images/Modelsim_Validation.png)
 
 ## Hardware Verification
 
@@ -49,7 +49,7 @@ Hardware testing was conducted successfully in two configurations:
 
 Additionally, an oscilloscope was used to probe the TX line. The capture confirmed the idle HIGH state, the bit pattern, and the ~104.16 µs bit duration expected for a 9600 bps baud rate.
 
-*(Insert image of Figure 8: Oscilloscope capture here)*
+![Oscilloscope Capture](Images/Oscilloscope_Validation.jpg)
 
 ## How to Run
 1. Clone this repository to your local machine.
